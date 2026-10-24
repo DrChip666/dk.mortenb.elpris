@@ -1,0 +1,15 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Place next 24 hours",
+    "da": "Plads næste døgn"
+  },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_percentile.svg",
+  "min": 0,
+  "max": 100
+}

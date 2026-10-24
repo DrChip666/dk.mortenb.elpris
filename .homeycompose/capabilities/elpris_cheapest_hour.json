@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Cheapest hour",
+    "da": "Billigste time"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_level.svg"
+}

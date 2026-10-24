@@ -1,0 +1,1 @@
+Se prisen for hvert kvarter for dit eget postnummer, med nettarif, afgifter og dit elselskabs tillæg regnet med. En widget på dashboardet viser i dag og i morgen som søjler farvet efter prisniveau, og Flow-betingelser lader dine apparater køre i de billigste perioder.

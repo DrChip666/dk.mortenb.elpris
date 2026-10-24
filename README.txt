@@ -1,0 +1,1 @@
+See the price of every quarter of an hour for your own postcode, with the grid tariff, taxes and your supplier's surcharge included. A dashboard widget shows today and tomorrow as bars coloured by price level, and Flow conditions let devices run in the cheapest periods.

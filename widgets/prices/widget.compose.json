@@ -1,0 +1,27 @@
+{
+  "name": {
+    "en": "Electricity price per quarter",
+    "da": "Elpris pr. kvarter"
+  },
+  "settings": [
+    {
+      "id": "location",
+      "type": "autocomplete",
+      "title": {
+        "en": "Electricity price device",
+        "da": "Elpris-enhed"
+      },
+      "hint": {
+        "en": "Leave empty to use your first Electricity price device.",
+        "da": "Lad feltet stå tomt for at bruge din første Elpris-enhed."
+      }
+    }
+  ],
+  "api": {
+    "getPrices": {
+      "method": "GET",
+      "path": "/"
+    }
+  },
+  "height": 300
+}

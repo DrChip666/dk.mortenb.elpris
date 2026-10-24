@@ -1,0 +1,163 @@
+<style>
+  .ep-modes label { display: flex; gap: 8px; align-items: center; padding: 6px 0; }
+  .ep-list { max-height: 46vh; overflow-y: auto; margin: 8px 0 12px; border-radius: 8px; }
+  .ep-item { display: flex; gap: 10px; align-items: flex-start; padding: 9px 4px; border-bottom: 1px solid rgba(127, 127, 127, 0.18); cursor: pointer; }
+  .ep-item input { margin-top: 3px; }
+  .ep-item-main { flex: 1; min-width: 0; }
+  .ep-item-supplier { font-weight: 600; }
+  .ep-item-product { opacity: 0.8; }
+  .ep-item-price { white-space: nowrap; font-variant-numeric: tabular-nums; }
+  .ep-note { opacity: 0.7; font-size: 0.9em; }
+  .ep-error { color: var(--homey-color-danger, #c8453b); }
+  .ep-hidden { display: none; }
+</style>
+
+<header class="homey-header">
+  <h1 class="homey-title" data-i18n="pair.agreement.title"></h1>
+  <p class="homey-subtitle" data-i18n="pair.agreement.subtitle"></p>
+</header>
+
+<form class="homey-form" onsubmit="return false;">
+  <div class="ep-modes">
+    <label><input type="radio" name="ep-mode" value="agreement" checked /> <span data-i18n="pair.agreement.modeAgreement"></span></label>
+    <label><input type="radio" name="ep-mode" value="manual" /> <span data-i18n="pair.agreement.modeManual"></span></label>
+    <label><input type="radio" name="ep-mode" value="none" /> <span data-i18n="pair.agreement.modeNone"></span></label>
+  </div>
+
+  <div id="ep-agreement">
+    <div class="homey-form-group">
+      <label class="homey-form-label" for="ep-search" data-i18n="pair.agreement.search"></label>
+      <input class="homey-form-input" id="ep-search" type="search" />
+    </div>
+    <p class="ep-note" id="ep-count"></p>
+    <div class="ep-list" id="ep-list" role="radiogroup"></div>
+    <p class="ep-error ep-hidden" id="ep-list-error"></p>
+  </div>
+
+  <div id="ep-manual" class="homey-form-group ep-hidden">
+    <label class="homey-form-label" for="ep-ore" data-i18n="pair.agreement.manualLabel"></label>
+    <input class="homey-form-input" id="ep-ore" type="number" step="0.01" inputmode="decimal" value="0" />
+    <p class="ep-note" data-i18n="pair.agreement.manualHint"></p>
+  </div>
+
+  <p class="ep-error ep-hidden" id="ep-error"></p>
+  <button class="homey-button-primary-full" id="ep-add" type="button" data-i18n="pair.agreement.add"></button>
+</form>
+
+<script type="text/javascript">
+  (function () {
+    var rows = [];
+    var selected = null;
+    var listEl = document.getElementById('ep-list');
+    var searchEl = document.getElementById('ep-search');
+    var countEl = document.getElementById('ep-count');
+    var errorEl = document.getElementById('ep-error');
+    var listErrorEl = document.getElementById('ep-list-error');
+    var lang = Homey.__('lang');
+
+    function show(el, on) { el.classList.toggle('ep-hidden', !on); }
+    function mode() { return document.querySelector('input[name="ep-mode"]:checked').value; }
+    function ore(value) {
+      var t = (Math.round(value * 100) / 100).toFixed(2);
+      return (lang === 'da' ? t.replace('.', ',') : t) + ' ' + Homey.__('pair.agreement.oreUnit');
+    }
+
+    function render() {
+      var q = searchEl.value.trim().toLowerCase();
+      var shown = rows.filter(function (r) {
+        return !q || (r.supplier + ' ' + r.product).toLowerCase().indexOf(q) >= 0;
+      });
+      countEl.textContent = Homey.__('pair.agreement.count', { shown: shown.length, total: rows.length });
+      listEl.innerHTML = '';
+      shown.forEach(function (r) {
+        var item = document.createElement('label');
+        item.className = 'ep-item';
+        var radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'ep-row';
+        radio.value = r.slug;
+        radio.checked = selected === r.slug;
+        radio.addEventListener('change', function () { selected = r.slug; });
+        var main = document.createElement('div');
+        main.className = 'ep-item-main';
+        var s = document.createElement('div');
+        s.className = 'ep-item-supplier';
+        s.textContent = r.supplier;
+        var p = document.createElement('div');
+        p.className = 'ep-item-product';
+        p.textContent = r.product + (r.spotBased ? '' : ' · ' + Homey.__('pair.agreement.fixed'));
+        main.appendChild(s);
+        main.appendChild(p);
+        var price = document.createElement('div');
+        price.className = 'ep-item-price';
+        price.textContent = (r.spotBased ? '+' : '') + ore(r.energyOre);
+        item.appendChild(radio);
+        item.appendChild(main);
+        item.appendChild(price);
+        listEl.appendChild(item);
+      });
+    }
+
+    function updateMode() {
+      show(document.getElementById('ep-agreement'), mode() === 'agreement');
+      show(document.getElementById('ep-manual'), mode() === 'manual');
+      show(errorEl, false);
+    }
+
+    Array.prototype.forEach.call(document.querySelectorAll('input[name="ep-mode"]'), function (el) {
+      el.addEventListener('change', updateMode);
+    });
+    searchEl.addEventListener('input', render);
+
+    Homey.showLoadingOverlay();
+    Homey.emit('list_agreements', null)
+      .then(function (res) {
+        Homey.hideLoadingOverlay();
+        rows = res.rows || [];
+        if (!res.ok || !rows.length) {
+          listErrorEl.textContent = Homey.__('pair.agreement.unavailable');
+          show(listErrorEl, true);
+        }
+        render();
+      })
+      .catch(function (err) {
+        Homey.hideLoadingOverlay();
+        listErrorEl.textContent = err.message || String(err);
+        show(listErrorEl, true);
+      });
+
+    document.getElementById('ep-add').addEventListener('click', function () {
+      show(errorEl, false);
+      var m = mode();
+      var choice = { mode: m };
+      if (m === 'agreement') {
+        var row = rows.filter(function (r) { return r.slug === selected; })[0];
+        if (!row) {
+          errorEl.textContent = Homey.__('pair.agreement.pickOne');
+          show(errorEl, true);
+          return;
+        }
+        choice.slug = row.slug;
+        choice.name = row.supplier;
+      }
+      if (m === 'manual') {
+        var value = parseFloat(String(document.getElementById('ep-ore').value).replace(',', '.'));
+        if (isNaN(value)) {
+          errorEl.textContent = Homey.__('pair.agreement.badNumber');
+          show(errorEl, true);
+          return;
+        }
+        choice.manualOre = value;
+      }
+      Homey.showLoadingOverlay();
+      Homey.emit('create', choice)
+        .then(function (device) { return Homey.createDevice(device); })
+        .then(function () { Homey.done(); })
+        .catch(function (err) {
+          Homey.hideLoadingOverlay();
+          errorEl.textContent = err.message || String(err);
+          show(errorEl, true);
+        });
+    });
+  })();
+</script>

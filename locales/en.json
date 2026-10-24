@@ -1,0 +1,108 @@
+{
+  "lang": "en",
+  "device": {
+    "name": "Electricity price"
+  },
+  "errors": {
+    "range": "The first number must not be larger than the second.",
+    "hours": "Enter hours from 0.25 to 24 in whole quarters, such as 3 or 1.5.",
+    "deadline": "Choose a deadline on a quarter: :00, :15, :30 or :45."
+  },
+  "pair": {
+    "location": {
+      "title": "Where do you live?",
+      "subtitle": "Prices include the grid tariff for your area, so the postcode matters.",
+      "label": "Postcode or grid area",
+      "check": "Look up",
+      "next": "Continue",
+      "invalid": "Enter a Danish postcode such as 2791, or a and a grid area code such as a791.",
+      "unknown": "Elpriser.dk does not know this place. Check the postcode and try again.",
+      "network": "Elpriser.dk could not be reached: __error__. Try again in a few minutes.",
+      "found": "Grid company:",
+      "area": "Grid area __area__ in __region__",
+      "ambiguous": "This postcode covers several grid areas. Pick the one on your electricity bill:",
+      "candidate": "Grid area __code__"
+    },
+    "agreement": {
+      "title": "Your supplier's surcharge",
+      "subtitle": "Added to every quarter so the price matches your bill. Subscriptions are left out because they do not change with the time of day.",
+      "modeAgreement": "Pick my agreement",
+      "modeManual": "Enter the surcharge myself",
+      "modeNone": "No surcharge, market price only",
+      "search": "Search supplier or agreement",
+      "count": "__shown__ of __total__ agreements",
+      "unavailable": "The list of agreements could not be loaded. Enter the surcharge yourself instead.",
+      "manualLabel": "Surcharge in øre/kWh including VAT",
+      "manualHint": "You find it on your bill or on the supplier's website.",
+      "add": "Add device",
+      "oreUnit": "øre/kWh",
+      "fixed": "fixed price",
+      "pickOne": "Pick an agreement in the list, or choose another option above.",
+      "badNumber": "Enter the surcharge as a number, such as 4.95."
+    }
+  },
+  "surcharge": {
+    "none": "No surcharge",
+    "manual": "Your own: __ore__ øre/kWh",
+    "agreement": "__supplier__, __product__: +__ore__ øre/kWh",
+    "fixed": "__supplier__, __product__: fixed __ore__ øre/kWh instead of the spot price",
+    "missing": "Agreement not found. Using your own surcharge: __ore__ øre/kWh",
+    "missingWarning": "Your agreement is no longer on Elpriser.dk. The surcharge you entered is used instead."
+  },
+  "settings": {
+    "placeInfo": "__company__, grid area __area__, __region__",
+    "placeUnknown": "Not known yet",
+    "stedFormat": "Write the place as __sted__."
+  },
+  "warnings": {
+    "noPrice": "No price for the current quarter yet.",
+    "tooFewAhead": "Fewer than four hours of prices ahead are known."
+  },
+  "widget": {
+    "location": "Electricity price",
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "now": "Now",
+    "levelcheap": "cheap",
+    "levelmid": "medium",
+    "levelexpensive": "expensive",
+    "peak": "Peak tariff",
+    "spot": "Spot",
+    "grid": "Grid",
+    "charges": "Taxes",
+    "surcharge": "Surcharge",
+    "energy": "Energy",
+    "source": "Source: Elpriser.dk",
+    "noDevice": "Add an Electricity price device first.",
+    "noData": "No prices yet. They are fetched every quarter.",
+    "tomorrowPending": "Tomorrow's prices usually arrive between 13 and 15.",
+    "unit": "kr/kWh",
+    "next": "Next quarter",
+    "hourAvg": "This hour",
+    "nextHour": "Next hour",
+    "dayAvg": "Average",
+    "dayMin": "Lowest",
+    "dayMax": "Highest",
+    "vsAvg": "vs average",
+    "percentile": "Place in day",
+    "percentileAhead": "Place next 24 h",
+    "minutesCheap": "Until cheap",
+    "tomorrowAvg": "Tomorrow avg.",
+    "cheapestHour": "Cheapest hour",
+    "dearestHour": "Most expensive hour",
+    "minutes": "min",
+    "nowCheap": "now",
+    "none": "–",
+    "showAll": "Show the whole day",
+    "showLess": "Show less",
+    "cheapestAhead": "Cheapest hour ahead",
+    "pending": "Tomorrow's prices arrive 13–15",
+    "hourAvgShort": "avg."
+  },
+  "hoursText": "__hours__: __price__ kr/kWh",
+  "level": {
+    "cheap": "cheap",
+    "mid": "medium",
+    "expensive": "expensive"
+  }
+}

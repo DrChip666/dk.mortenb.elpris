@@ -1,0 +1,17 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Until cheap",
+    "da": "Til billig"
+  },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_tomorrow.svg",
+  "units": {
+    "en": "min",
+    "da": "min"
+  }
+}

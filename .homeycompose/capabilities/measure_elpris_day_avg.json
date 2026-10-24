@@ -1,0 +1,17 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Day average",
+    "da": "Dagens gennemsnit"
+  },
+  "decimals": 2,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_level.svg",
+  "units": {
+    "en": "kr/kWh",
+    "da": "kr./kWh"
+  }
+}

@@ -1,0 +1,1033 @@
+{
+  "_comment": "This file is generated. Please edit .homeycompose/app.json instead.",
+  "id": "dk.mortenb.elpris",
+  "version": "1.2.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "runtime": "nodejs",
+  "platforms": [
+    "local"
+  ],
+  "name": {
+    "en": "Electricity Price",
+    "da": "Elpris"
+  },
+  "description": {
+    "en": "See what every quarter of an hour costs, with your own supplier's surcharge",
+    "da": "Se hvad hvert kvarter koster, med dit eget elselskabs tillæg"
+  },
+  "category": [
+    "energy"
+  ],
+  "tags": {
+    "en": [
+      "electricity price",
+      "spot price",
+      "quarter",
+      "Denmark",
+      "grid tariff"
+    ],
+    "da": [
+      "elpris",
+      "spotpris",
+      "kvarter",
+      "Danmark",
+      "nettarif"
+    ]
+  },
+  "brandColor": "#1F5F8B",
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Morten B."
+  },
+  "contributors": {
+    "developers": [
+      {
+        "name": "Morten B."
+      },
+      {
+        "name": "Claude (Anthropic), AI coding assistant"
+      }
+    ]
+  },
+  "contributing": {
+    "donate": {
+      "paypal": {
+        "username": "MortenBech241"
+      }
+    }
+  },
+  "flow": {
+    "triggers": [
+      {
+        "id": "quarter_started",
+        "title": {
+          "en": "A new quarter starts",
+          "da": "Et nyt kvarter starter"
+        },
+        "tokens": [
+          {
+            "name": "price",
+            "type": "number",
+            "title": {
+              "en": "Price",
+              "da": "Pris"
+            },
+            "example": 1.25
+          },
+          {
+            "name": "level",
+            "type": "string",
+            "title": {
+              "en": "Level",
+              "da": "Niveau"
+            },
+            "example": {
+              "en": "cheap",
+              "da": "billig"
+            }
+          },
+          {
+            "name": "percentile",
+            "type": "number",
+            "title": {
+              "en": "Place in the day",
+              "da": "Plads i døgnet"
+            },
+            "example": 30
+          },
+          {
+            "name": "quarter",
+            "type": "string",
+            "title": {
+              "en": "Quarter",
+              "da": "Kvarter"
+            },
+            "example": "20:15–20:30"
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=location"
+          }
+        ]
+      },
+      {
+        "id": "tomorrow_ready",
+        "title": {
+          "en": "Tomorrow's prices are ready",
+          "da": "Morgendagens priser er klar"
+        },
+        "hint": {
+          "en": "Usually between 13 and 15.",
+          "da": "Typisk mellem kl. 13 og 15."
+        },
+        "tokens": [
+          {
+            "name": "average",
+            "type": "number",
+            "title": {
+              "en": "Average",
+              "da": "Gennemsnit"
+            },
+            "example": 0.85
+          },
+          {
+            "name": "cheapest_hour",
+            "type": "string",
+            "title": {
+              "en": "Cheapest hour",
+              "da": "Billigste time"
+            },
+            "example": "04–05"
+          },
+          {
+            "name": "cheapest_price",
+            "type": "number",
+            "title": {
+              "en": "Cheapest hour price",
+              "da": "Pris i billigste time"
+            },
+            "example": 0.45
+          },
+          {
+            "name": "dearest_hour",
+            "type": "string",
+            "title": {
+              "en": "Most expensive hour",
+              "da": "Dyreste time"
+            },
+            "example": "18–19"
+          },
+          {
+            "name": "dearest_price",
+            "type": "number",
+            "title": {
+              "en": "Most expensive hour price",
+              "da": "Pris i dyreste time"
+            },
+            "example": 2.3
+          }
+        ],
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=location"
+          }
+        ]
+      }
+    ],
+    "conditions": [
+      {
+        "id": "level_is",
+        "title": {
+          "en": "Price level !{{is|isn't}}",
+          "da": "Prisniveauet !{{er|er ikke}}"
+        },
+        "titleFormatted": {
+          "en": "Price level !{{is|isn't}} [[level]]",
+          "da": "Prisniveauet !{{er|er ikke}} [[level]]"
+        },
+        "hint": {
+          "en": "Cheap, medium or expensive compared with the day's own quarters.",
+          "da": "Billig, middel eller dyr i forhold til døgnets egne kvarterer."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=location"
+          },
+          {
+            "name": "level",
+            "type": "dropdown",
+            "title": {
+              "en": "Level",
+              "da": "Niveau"
+            },
+            "values": [
+              {
+                "id": "cheap",
+                "label": {
+                  "en": "cheap",
+                  "da": "billig"
+                }
+              },
+              {
+                "id": "mid",
+                "label": {
+                  "en": "medium",
+                  "da": "middel"
+                }
+              },
+              {
+                "id": "expensive",
+                "label": {
+                  "en": "expensive",
+                  "da": "dyr"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "cheapest_hours",
+        "title": {
+          "en": "Quarter !{{is|isn't}} in today's cheapest hours",
+          "da": "Kvarteret !{{ligger|ligger ikke}} i dagens billigste timer"
+        },
+        "titleFormatted": {
+          "en": "Quarter !{{is|isn't}} in today's [[count]] cheapest hours",
+          "da": "Kvarteret !{{ligger|ligger ikke}} i dagens [[count]] billigste timer"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=location"
+          },
+          {
+            "name": "count",
+            "type": "number",
+            "title": {
+              "en": "Hours",
+              "da": "Timer"
+            },
+            "min": 1,
+            "max": 24,
+            "step": 1,
+            "placeholder": {
+              "en": "4",
+              "da": "4"
+            }
+          }
+        ]
+      },
+      {
+        "id": "percentile_ahead",
+        "title": {
+          "en": "Place in the next 24 hours !{{is|isn't}} within a range",
+          "da": "Pladsen i næste døgn !{{er|er ikke}} i et interval"
+        },
+        "titleFormatted": {
+          "en": "Place in the next 24 hours !{{is|isn't}} between [[from]] and [[to]]",
+          "da": "Pladsen i næste døgn !{{er|er ikke}} mellem [[from]] og [[to]]"
+        },
+        "hint": {
+          "en": "0 is the cheapest and 100 the most expensive quarter among the known quarters from now and 24 hours ahead. Good for a heat pump.",
+          "da": "0 er det billigste og 100 det dyreste kvarter blandt de kendte kvarterer fra nu og et døgn frem. God til en varmepumpe."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=location"
+          },
+          {
+            "name": "from",
+            "type": "number",
+            "title": {
+              "en": "From",
+              "da": "Fra"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "placeholder": {
+              "en": "0",
+              "da": "0"
+            }
+          },
+          {
+            "name": "to",
+            "type": "number",
+            "title": {
+              "en": "To",
+              "da": "Til"
+            },
+            "min": 0,
+            "max": 100,
+            "step": 1,
+            "placeholder": {
+              "en": "20",
+              "da": "20"
+            }
+          }
+        ]
+      },
+      {
+        "id": "price_below",
+        "title": {
+          "en": "Price !{{is|isn't}} below an amount",
+          "da": "Prisen !{{er|er ikke}} under et beløb"
+        },
+        "titleFormatted": {
+          "en": "Price !{{is|isn't}} below [[price]] kr/kWh",
+          "da": "Prisen !{{er|er ikke}} under [[price]] kr./kWh"
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=location"
+          },
+          {
+            "name": "price",
+            "type": "number",
+            "title": {
+              "en": "Price",
+              "da": "Pris"
+            },
+            "min": -10,
+            "max": 20,
+            "step": 0.01,
+            "placeholder": {
+              "en": "1.00",
+              "da": "1,00"
+            }
+          }
+        ]
+      },
+      {
+        "id": "run_now",
+        "title": {
+          "en": "Use !{{should|shouldn't}} run now to finish in time",
+          "da": "Forbruget !{{skal|skal ikke}} køre nu for at blive færdigt"
+        },
+        "titleFormatted": {
+          "en": "[[hours]] hours of use !{{should|shouldn't}} run now to finish by [[deadline]], [[mode]]",
+          "da": "[[hours]] timers forbrug !{{skal|skal ikke}} køre nu for at være færdigt kl. [[deadline]], [[mode]]"
+        },
+        "hint": {
+          "en": "Yes in the cheapest period before the deadline. Yes as well when there is no time left to wait. No when the deadline lies after the known prices; tomorrow's usually arrive between 13 and 15.",
+          "da": "Ja i den billigste periode før fristen. Også Ja, når der ikke er tid til at vente. Nej, når fristen ligger efter de kendte priser; morgendagens kommer typisk mellem kl. 13 og 15."
+        },
+        "args": [
+          {
+            "type": "device",
+            "name": "device",
+            "filter": "driver_id=location"
+          },
+          {
+            "name": "hours",
+            "type": "number",
+            "title": {
+              "en": "Hours",
+              "da": "Timer"
+            },
+            "min": 0.25,
+            "max": 24,
+            "step": 0.25,
+            "placeholder": {
+              "en": "3",
+              "da": "3"
+            }
+          },
+          {
+            "name": "deadline",
+            "type": "time",
+            "title": {
+              "en": "Deadline",
+              "da": "Frist"
+            }
+          },
+          {
+            "name": "mode",
+            "type": "dropdown",
+            "title": {
+              "en": "How",
+              "da": "Hvordan"
+            },
+            "values": [
+              {
+                "id": "block",
+                "label": {
+                  "en": "in one go",
+                  "da": "i ét stræk"
+                }
+              },
+              {
+                "id": "flexible",
+                "label": {
+                  "en": "breaks allowed",
+                  "da": "gerne med pauser"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "drivers": [
+    {
+      "name": {
+        "en": "Electricity price",
+        "da": "Elpris"
+      },
+      "class": "sensor",
+      "capabilities": [
+        "measure_elpris_now",
+        "elpris_level",
+        "measure_elpris_next",
+        "measure_elpris_hour",
+        "measure_elpris_next_hour",
+        "measure_elpris_day_avg",
+        "measure_elpris_day_min",
+        "measure_elpris_day_max",
+        "measure_elpris_vs_avg",
+        "measure_elpris_percentile",
+        "measure_elpris_percentile_ahead",
+        "measure_elpris_minutes_cheap",
+        "elpris_tomorrow",
+        "measure_elpris_tomorrow_avg",
+        "elpris_cheapest_hour",
+        "elpris_dearest_hour"
+      ],
+      "platforms": [
+        "local"
+      ],
+      "connectivity": [
+        "cloud"
+      ],
+      "images": {
+        "small": "/drivers/location/assets/images/small.png",
+        "large": "/drivers/location/assets/images/large.png",
+        "xlarge": "/drivers/location/assets/images/xlarge.png"
+      },
+      "pair": [
+        {
+          "id": "location",
+          "navigation": {
+            "next": "agreement"
+          }
+        },
+        {
+          "id": "agreement",
+          "navigation": {
+            "prev": "location"
+          }
+        }
+      ],
+      "id": "location",
+      "settings": [
+        {
+          "type": "group",
+          "label": {
+            "en": "Location",
+            "da": "Sted"
+          },
+          "children": [
+            {
+              "id": "sted",
+              "type": "text",
+              "label": {
+                "en": "Postcode or grid area",
+                "da": "Postnummer eller netområde"
+              },
+              "value": "",
+              "hint": {
+                "en": "A Danish postcode such as 2791, or a and the grid area code such as a791 when your postcode covers several grid areas.",
+                "da": "Et postnummer som 2791, eller a og netområdets kode som a791, når dit postnummer dækker flere netområder."
+              }
+            },
+            {
+              "id": "place_info",
+              "type": "label",
+              "label": {
+                "en": "Grid company",
+                "da": "Netselskab"
+              },
+              "value": ""
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Supplier surcharge",
+            "da": "Elselskabets tillæg"
+          },
+          "children": [
+            {
+              "id": "surcharge_mode",
+              "type": "dropdown",
+              "label": {
+                "en": "Surcharge from",
+                "da": "Tillæg fra"
+              },
+              "value": "agreement",
+              "values": [
+                {
+                  "id": "agreement",
+                  "label": {
+                    "en": "My agreement on Elpriser.dk",
+                    "da": "Min aftale på Elpriser.dk"
+                  }
+                },
+                {
+                  "id": "manual",
+                  "label": {
+                    "en": "Entered by me",
+                    "da": "Indtastet af mig"
+                  }
+                },
+                {
+                  "id": "none",
+                  "label": {
+                    "en": "No surcharge",
+                    "da": "Uden tillæg"
+                  }
+                }
+              ]
+            },
+            {
+              "id": "agreement_slug",
+              "type": "text",
+              "label": {
+                "en": "Agreement ID",
+                "da": "Aftalens ID"
+              },
+              "value": "",
+              "hint": {
+                "en": "Set during pairing. To choose another agreement, add the device again, or enter the productSlug from elpriser.json.",
+                "da": "Sættes, når enheden tilføjes. Vil du vælge en anden aftale, så tilføj enheden igen, eller skriv productSlug fra elpriser.json."
+              }
+            },
+            {
+              "id": "manual_surcharge",
+              "type": "number",
+              "label": {
+                "en": "My surcharge",
+                "da": "Mit tillæg"
+              },
+              "value": 0,
+              "min": -100,
+              "max": 500,
+              "step": 0.01,
+              "units": {
+                "en": "øre/kWh",
+                "da": "øre/kWh"
+              },
+              "hint": {
+                "en": "Including VAT. Used when the surcharge is entered by you, and as a fallback when the agreement cannot be found.",
+                "da": "Inkl. moms. Bruges, når tillægget er indtastet af dig, og som reserve, hvis aftalen ikke kan findes."
+              }
+            },
+            {
+              "id": "agreement_info",
+              "type": "label",
+              "label": {
+                "en": "Surcharge in use",
+                "da": "Tillæg i brug"
+              },
+              "value": ""
+            }
+          ]
+        },
+        {
+          "type": "group",
+          "label": {
+            "en": "Values shown",
+            "da": "Viste værdier"
+          },
+          "children": [
+            {
+              "id": "show_next",
+              "type": "checkbox",
+              "label": {
+                "en": "Next quarter",
+                "da": "Næste kvarter"
+              },
+              "value": true
+            },
+            {
+              "id": "show_hour",
+              "type": "checkbox",
+              "label": {
+                "en": "Hour average",
+                "da": "Timegennemsnit"
+              },
+              "value": true
+            },
+            {
+              "id": "show_next_hour",
+              "type": "checkbox",
+              "label": {
+                "en": "Next hour",
+                "da": "Næste time"
+              },
+              "value": true
+            },
+            {
+              "id": "show_day",
+              "type": "checkbox",
+              "label": {
+                "en": "Day average, lowest and highest",
+                "da": "Dagens gennemsnit, laveste og højeste"
+              },
+              "value": true
+            },
+            {
+              "id": "show_vs_avg",
+              "type": "checkbox",
+              "label": {
+                "en": "Compared with average",
+                "da": "I forhold til gennemsnit"
+              },
+              "value": true
+            },
+            {
+              "id": "show_percentile",
+              "type": "checkbox",
+              "label": {
+                "en": "Place in the day",
+                "da": "Plads i døgnet"
+              },
+              "value": true
+            },
+            {
+              "id": "show_percentile_ahead",
+              "type": "checkbox",
+              "label": {
+                "en": "Place next 24 hours",
+                "da": "Plads næste døgn"
+              },
+              "value": true
+            },
+            {
+              "id": "show_minutes_cheap",
+              "type": "checkbox",
+              "label": {
+                "en": "Minutes until cheap",
+                "da": "Minutter til billig"
+              },
+              "value": true
+            },
+            {
+              "id": "show_tomorrow",
+              "type": "checkbox",
+              "label": {
+                "en": "Tomorrow's prices and average",
+                "da": "Morgendagens priser og gennemsnit"
+              },
+              "value": true
+            },
+            {
+              "id": "show_hours_text",
+              "type": "checkbox",
+              "label": {
+                "en": "Cheapest and most expensive hour",
+                "da": "Billigste og dyreste time"
+              },
+              "value": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "widgets": {
+    "prices": {
+      "name": {
+        "en": "Electricity price per quarter",
+        "da": "Elpris pr. kvarter"
+      },
+      "settings": [
+        {
+          "id": "location",
+          "type": "autocomplete",
+          "title": {
+            "en": "Electricity price device",
+            "da": "Elpris-enhed"
+          },
+          "hint": {
+            "en": "Leave empty to use your first Electricity price device.",
+            "da": "Lad feltet stå tomt for at bruge din første Elpris-enhed."
+          }
+        }
+      ],
+      "api": {
+        "getPrices": {
+          "method": "GET",
+          "path": "/"
+        }
+      },
+      "height": 300,
+      "id": "prices"
+    }
+  },
+  "capabilities": {
+    "elpris_cheapest_hour": {
+      "type": "string",
+      "title": {
+        "en": "Cheapest hour",
+        "da": "Billigste time"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_level.svg"
+    },
+    "elpris_dearest_hour": {
+      "type": "string",
+      "title": {
+        "en": "Most expensive hour",
+        "da": "Dyreste time"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_level.svg"
+    },
+    "elpris_level": {
+      "type": "enum",
+      "title": {
+        "en": "Price level",
+        "da": "Prisniveau"
+      },
+      "values": [
+        {
+          "id": "cheap",
+          "title": {
+            "en": "Cheap",
+            "da": "Billig"
+          }
+        },
+        {
+          "id": "mid",
+          "title": {
+            "en": "Medium",
+            "da": "Middel"
+          }
+        },
+        {
+          "id": "expensive",
+          "title": {
+            "en": "Expensive",
+            "da": "Dyr"
+          }
+        }
+      ],
+      "getable": true,
+      "setable": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_level.svg"
+    },
+    "elpris_percentile": {
+      "type": "number",
+      "title": {
+        "en": "Place in the day",
+        "da": "Plads i døgnet"
+      },
+      "min": 0,
+      "max": 100,
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_percentile.svg"
+    },
+    "elpris_price": {
+      "type": "number",
+      "title": {
+        "en": "Price",
+        "da": "Pris"
+      },
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_price.svg"
+    },
+    "elpris_tomorrow": {
+      "type": "boolean",
+      "title": {
+        "en": "Tomorrow's prices",
+        "da": "Morgendagens priser"
+      },
+      "getable": true,
+      "setable": false,
+      "insights": false,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_tomorrow.svg"
+    },
+    "measure_elpris_day_avg": {
+      "type": "number",
+      "title": {
+        "en": "Day average",
+        "da": "Dagens gennemsnit"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_level.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_day_max": {
+      "type": "number",
+      "title": {
+        "en": "Day's highest",
+        "da": "Dagens højeste"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_level.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_day_min": {
+      "type": "number",
+      "title": {
+        "en": "Day's lowest",
+        "da": "Dagens laveste"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_level.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_hour": {
+      "type": "number",
+      "title": {
+        "en": "Hour average",
+        "da": "Timegennemsnit"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_price.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_minutes_cheap": {
+      "type": "number",
+      "title": {
+        "en": "Until cheap",
+        "da": "Til billig"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_tomorrow.svg",
+      "units": {
+        "en": "min",
+        "da": "min"
+      }
+    },
+    "measure_elpris_next": {
+      "type": "number",
+      "title": {
+        "en": "Next quarter",
+        "da": "Næste kvarter"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_price.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_next_hour": {
+      "type": "number",
+      "title": {
+        "en": "Next hour",
+        "da": "Næste time"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_price.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_now": {
+      "type": "number",
+      "title": {
+        "en": "Price now",
+        "da": "Pris nu"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_price.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_percentile": {
+      "type": "number",
+      "title": {
+        "en": "Place in the day",
+        "da": "Plads i døgnet"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_percentile.svg",
+      "min": 0,
+      "max": 100
+    },
+    "measure_elpris_percentile_ahead": {
+      "type": "number",
+      "title": {
+        "en": "Place next 24 hours",
+        "da": "Plads næste døgn"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_percentile.svg",
+      "min": 0,
+      "max": 100
+    },
+    "measure_elpris_tomorrow_avg": {
+      "type": "number",
+      "title": {
+        "en": "Tomorrow's average",
+        "da": "Morgendagens gennemsnit"
+      },
+      "decimals": 2,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_tomorrow.svg",
+      "units": {
+        "en": "kr/kWh",
+        "da": "kr./kWh"
+      }
+    },
+    "measure_elpris_vs_avg": {
+      "type": "number",
+      "title": {
+        "en": "Compared with average",
+        "da": "I forhold til gennemsnit"
+      },
+      "decimals": 0,
+      "getable": true,
+      "setable": false,
+      "insights": true,
+      "uiComponent": "sensor",
+      "icon": "/assets/capability_percentile.svg",
+      "units": {
+        "en": "%",
+        "da": "%"
+      }
+    }
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Compared with average",
+    "da": "I forhold til gennemsnit"
+  },
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_percentile.svg",
+  "units": {
+    "en": "%",
+    "da": "%"
+  }
+}

@@ -1,0 +1,457 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root { --ep-cheap: #2f9e77; --ep-mid: #d7a22a; --ep-expensive: #c9483b; --ep-line: rgba(127, 127, 127, 0.16); }
+    * { box-sizing: border-box; }
+    body { margin: 0; color: var(--homey-text-color, #1d1d1f); font: inherit; -webkit-user-select: none; user-select: none; overflow: hidden; }
+    .ep-hidden { display: none !important; }
+    .ep-muted { opacity: 0.6; }
+    button { font: inherit; color: inherit; }
+
+    /* Compact view: 300 px, the next 24 hours as bars. */
+    .ep-compact { height: 268px; display: flex; flex-direction: column; }
+    .ep-head { height: 60px; flex-shrink: 0; display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .ep-price { font-size: 34px; line-height: 1; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: -0.02em; display: flex; align-items: baseline; gap: 6px; }
+    .ep-trend { font-size: 18px; font-weight: 600; opacity: 0.55; }
+    .ep-sub { margin-top: 6px; font-size: 13px; display: flex; gap: 10px; align-items: baseline; white-space: nowrap; }
+    .ep-level { font-weight: 600; }
+    .ep-level.cheap { color: var(--ep-cheap); }
+    .ep-level.mid { color: var(--ep-mid); }
+    .ep-level.expensive { color: var(--ep-expensive); }
+    .ep-fig { text-align: right; }
+    .ep-fig-label { font-size: 12px; opacity: 0.6; white-space: nowrap; }
+    .ep-fig-value { margin-top: 4px; font-size: 18px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .ep-fig-note { font-size: 12px; opacity: 0.6; font-variant-numeric: tabular-nums; }
+
+    .ep-chart { position: relative; flex: 1; min-height: 80px; margin-top: 12px; cursor: pointer; touch-action: manipulation; }
+    .ep-chart svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+    .ep-band { position: absolute; top: -4px; bottom: 0; background: rgba(127, 127, 127, 0.12); border-radius: 4px; pointer-events: none; }
+    .ep-band span { position: absolute; top: 2px; left: 4px; font-size: 10px; opacity: 0.65; white-space: nowrap; }
+    .ep-pending { position: absolute; bottom: 6px; font-size: 11px; opacity: 0.55; text-align: center; pointer-events: none; padding: 0 6px; }
+    .ep-marker { position: absolute; top: -10px; width: 0; height: 0; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid currentColor; transform: translateX(-5px); pointer-events: none; }
+
+    .ep-axis { position: relative; height: 16px; flex-shrink: 0; margin-top: 4px; font-size: 11px; opacity: 0.6; font-variant-numeric: tabular-nums; }
+    .ep-axis span { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+
+    .ep-detail { height: 46px; flex-shrink: 0; margin-top: 6px; font-size: 12px; }
+    .ep-detail-head { display: flex; justify-content: space-between; gap: 8px; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .ep-stack { display: flex; height: 6px; border-radius: 3px; overflow: hidden; margin-top: 5px; background: var(--ep-line); }
+    .ep-stack div { height: 100%; }
+    .ep-legend { display: flex; gap: 8px; overflow: hidden; margin-top: 4px; opacity: 0.75; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .ep-legend i { display: inline-block; width: 7px; height: 7px; border-radius: 2px; margin-right: 3px; }
+
+    .ep-foot { height: 22px; flex-shrink: 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 11px; white-space: nowrap; }
+    .ep-link { background: none; border: 0; padding: 0; cursor: pointer; text-decoration: underline; text-underline-offset: 2px; opacity: 0.55; }
+    .ep-more { border: 0; cursor: pointer; font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: 999px; background: rgba(127, 127, 127, 0.14); }
+    .ep-more:focus-visible, .ep-tab:focus-visible { outline: 2px solid currentColor; outline-offset: 1px; }
+
+    /* Expanded view: the whole day as a table, one row per hour. */
+    .ep-full { margin-top: 14px; }
+    .ep-full-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+    .ep-tabs { display: inline-flex; border-radius: 999px; padding: 2px; background: rgba(127, 127, 127, 0.14); }
+    .ep-tab { border: 0; background: transparent; font-size: 12px; padding: 5px 10px; border-radius: 999px; cursor: pointer; opacity: 0.7; }
+    .ep-tab[aria-pressed="true"] { background: var(--homey-background-color, #fff); opacity: 1; font-weight: 600; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.12); }
+    .ep-tab:disabled { opacity: 0.3; cursor: default; }
+    .ep-cols { display: grid; grid-template-columns: 26px repeat(4, 1fr) 46px; gap: 3px; font-size: 10px; opacity: 0.55; margin-bottom: 3px; font-variant-numeric: tabular-nums; }
+    .ep-cols span:last-child { text-align: right; }
+    .ep-rows { display: flex; flex-direction: column; gap: 3px; }
+    .ep-hrow { display: grid; grid-template-columns: 26px repeat(4, 1fr) 46px; gap: 3px; align-items: center; height: 20px; border-radius: 4px; font-variant-numeric: tabular-nums; }
+    .ep-hrow.ep-peak { background: rgba(127, 127, 127, 0.1); }
+    .ep-hrow.ep-past { opacity: 0.4; }
+    .ep-hrow b { font-size: 11px; font-weight: 600; padding-left: 3px; }
+    .ep-hrow .ep-avg { font-size: 11px; text-align: right; padding-right: 3px; }
+    .ep-cell { height: 16px; border-radius: 3px; border: 0; padding: 0; cursor: pointer; }
+    .ep-cell.ep-now { box-shadow: 0 0 0 2px var(--homey-background-color, #fff), 0 0 0 3.5px currentColor; }
+    .ep-cell.ep-picked { outline: 2px solid currentColor; outline-offset: 1px; }
+    .ep-full .ep-detail { height: auto; min-height: 46px; margin: 10px 0 4px; }
+
+    .ep-grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: 18px; margin-top: 6px; }
+    .ep-row { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; padding: 6px 0; border-bottom: 1px solid var(--ep-line); font-size: 12px; }
+    .ep-row b { font-size: 14px; font-weight: 650; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .ep-row span { opacity: 0.65; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .ep-empty { padding: 40px 0; text-align: center; opacity: 0.7; font-size: 14px; }
+  </style>
+</head>
+<body class="homey-widget">
+  <div id="ep-empty" class="ep-empty ep-hidden"></div>
+
+  <div id="ep-main" class="ep-hidden">
+    <div class="ep-compact">
+      <div class="ep-head" id="ep-head"></div>
+      <div class="ep-chart" id="ep-chart">
+        <div id="ep-bands"></div>
+        <svg id="ep-svg" preserveAspectRatio="none" aria-hidden="true"></svg>
+        <div class="ep-pending ep-hidden" id="ep-pending"></div>
+        <div class="ep-marker ep-hidden" id="ep-marker"></div>
+      </div>
+      <div class="ep-axis" id="ep-axis"></div>
+      <div class="ep-detail" id="ep-detail"></div>
+      <div class="ep-foot">
+        <button class="ep-link" id="ep-source" type="button"></button>
+        <button class="ep-more" id="ep-more" type="button" aria-expanded="false"></button>
+      </div>
+    </div>
+
+    <div class="ep-full ep-hidden" id="ep-full">
+      <div class="ep-full-top">
+        <div class="ep-tabs" role="group">
+          <button class="ep-tab" id="ep-tab-0" type="button"></button>
+          <button class="ep-tab" id="ep-tab-1" type="button"></button>
+        </div>
+        <span class="ep-muted" style="font-size:12px" id="ep-full-unit"></span>
+      </div>
+      <div class="ep-cols"><span></span><span>:00</span><span>:15</span><span>:30</span><span>:45</span><span id="ep-avg-head"></span></div>
+      <div class="ep-rows" id="ep-rows"></div>
+      <div class="ep-detail" id="ep-full-detail"></div>
+      <div class="ep-grid" id="ep-grid"></div>
+    </div>
+  </div>
+
+  <script type="text/javascript">
+    var LEVEL_COLOR = { cheap: 'var(--ep-cheap)', mid: 'var(--ep-mid)', expensive: 'var(--ep-expensive)' };
+    var PART_COLOR = { spot: '#5b8def', grid: '#9a6fd6', charges: '#8a8f98', surcharge: '#e07f3c' };
+    var COMPACT = 300;
+    var WINDOW = 96; // quarters in the compact chart: 24 hours
+
+    function onHomeyReady(Homey) {
+      var state = { data: null, expanded: false, view: 0, picked: null, fullPicked: null, ready: false };
+      var lang = Homey.__('lang');
+      var t = function (key, tokens) { return Homey.__('widget.' + key, tokens); };
+      var $ = function (id) { return document.getElementById(id); };
+      var el = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text !== undefined) e.textContent = text; return e; };
+      function num(x, d) { var s = x.toFixed(d); return lang === 'da' ? s.replace('.', ',') : s; }
+      function kr(ore) { return ore === null || ore === undefined ? t('none') : num(ore / 100, 2); }
+      function deviceId() { var s = Homey.getSettings() || {}; return s.location && s.location.id ? s.location.id : ''; }
+
+      $('ep-source').textContent = t('source');
+      $('ep-tab-0').textContent = t('today');
+      $('ep-tab-1').textContent = t('tomorrow');
+      $('ep-full-unit').textContent = t('unit');
+      $('ep-avg-head').textContent = t('hourAvgShort');
+
+      function load() {
+        return Homey.api('GET', '/?id=' + encodeURIComponent(deviceId()), {})
+          .then(function (res) { state.data = res; render(); })
+          .catch(function () { render(); })
+          .then(function () { if (!state.ready) { state.ready = true; Homey.ready(); } });
+      }
+
+      function allQuarters(res) {
+        return res.days.reduce(function (list, d) { return list.concat(d.quarters); }, []);
+      }
+      function indexAt(qs, now) {
+        for (var i = 0; i < qs.length; i++) if (qs[i].from <= now && now < qs[i].to) return i;
+        return -1;
+      }
+
+      function render() {
+        var res = state.data;
+        var empty = !res || !res.ok || !res.days || !res.days.length;
+        $('ep-empty').classList.toggle('ep-hidden', !empty);
+        $('ep-main').classList.toggle('ep-hidden', empty);
+        if (empty) {
+          $('ep-empty').textContent = res && res.reason === 'noDevice' ? t('noDevice') : t('noData');
+          return;
+        }
+        var now = Date.now();
+        var all = allQuarters(res);
+        var cur = indexAt(all, now);
+
+        // The compact window: from the start of the previous hour and 24 hours on, so what comes next is always in view.
+        var start = 0;
+        if (cur >= 0) {
+          start = cur;
+          while (start > 0 && all[start].label.slice(3, 5) !== '00') start--;
+          start = Math.max(0, start - 4);
+        }
+        var win = all.slice(start, start + WINDOW);
+
+        renderHead(res, all, cur);
+        drawChart(win, cur - start, all.length - start < WINDOW);
+        var pick = state.picked !== null && state.picked < win.length ? state.picked : cur - start;
+        renderDetail($('ep-detail'), win[pick], res, '');
+
+        $('ep-more').textContent = state.expanded ? t('showLess') : t('showAll');
+        $('ep-more').setAttribute('aria-expanded', String(state.expanded));
+        $('ep-full').classList.toggle('ep-hidden', !state.expanded);
+        if (state.expanded) renderFull(res, now);
+      }
+
+      function renderHead(res, all, cur) {
+        var head = $('ep-head');
+        head.innerHTML = '';
+        var st = res.stats;
+        var left = el('div');
+        var price = el('div', 'ep-price', st ? kr(st.now) : t('none'));
+        if (st && st.next !== null) {
+          var diff = st.next - st.now;
+          price.appendChild(el('span', 'ep-trend', diff > 0.5 ? '↑' : diff < -0.5 ? '↓' : '→'));
+        }
+        left.appendChild(price);
+        var sub = el('div', 'ep-sub');
+        sub.appendChild(el('span', 'ep-muted', t('unit')));
+        if (st) {
+          sub.appendChild(el('span', 'ep-level ' + st.level, t('level' + st.level)));
+          sub.appendChild(el('span', 'ep-muted', st.label));
+        }
+        left.appendChild(sub);
+        head.appendChild(left);
+
+        // The cheapest whole hour from now on among the known prices.
+        if (cur >= 0) {
+          var best = null;
+          var i = cur;
+          while (i < all.length) {
+            var j = i;
+            var group = [];
+            while (j < all.length && all[j].hour === all[i].hour && group.length < 4) { group.push(all[j]); j++; }
+            if (group.length === 4 || j === all.length) {
+              var avg = group.reduce(function (a, q) { return a + q.price; }, 0) / group.length;
+              if (!best || avg < best.avg) best = { avg: avg, label: group[0].label.slice(0, 2) + '–' + group[group.length - 1].label.slice(6, 8) };
+            }
+            i = j;
+          }
+          if (best) {
+            var fig = el('div', 'ep-fig');
+            fig.appendChild(el('div', 'ep-fig-label', t('cheapestAhead')));
+            fig.appendChild(el('div', 'ep-fig-value', best.label));
+            fig.appendChild(el('div', 'ep-fig-note', kr(best.avg) + ' ' + t('unit')));
+            head.appendChild(fig);
+          }
+        }
+      }
+
+      function drawChart(win, cur, pending) {
+        var n = WINDOW;
+        var max = 0;
+        var min = 0;
+        win.forEach(function (q) { if (q.price > max) max = q.price; if (q.price < min) min = q.price; });
+        var span = (max - min) || 1;
+        var TOP = 14;
+        var H = 100 - TOP;
+        var zero = TOP + (max / span) * H;
+        var parts = [];
+        win.forEach(function (q, i) {
+          var h = (Math.abs(q.price) / span) * H;
+          var y = q.price >= 0 ? zero - h : zero;
+          var opacity = state.picked === i || i === cur ? 1 : i < cur ? 0.4 : 0.85;
+          parts.push('<rect x="' + (i + 0.12) + '" y="' + y.toFixed(2) + '" width="0.76" height="' + Math.max(h, 0.6).toFixed(2) +
+            '" fill="' + LEVEL_COLOR[q.level] + '" opacity="' + opacity + '"/>');
+          // A thin line where a new day begins.
+          if (i > 0 && q.label.slice(0, 5) === '00:00') {
+            parts.push('<line x1="' + i + '" x2="' + i + '" y1="0" y2="100" stroke="currentColor" stroke-opacity="0.25" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>');
+          }
+        });
+        if (min < 0) parts.push('<line x1="0" x2="' + n + '" y1="' + zero.toFixed(2) + '" y2="' + zero.toFixed(2) + '" stroke="currentColor" stroke-opacity="0.3" stroke-width="1" vector-effect="non-scaling-stroke"/>');
+        $('ep-svg').setAttribute('viewBox', '0 0 ' + n + ' 100');
+        $('ep-svg').innerHTML = parts.join('');
+
+        // Peak tariff: each day's stretches at that day's highest grid tariff step.
+        var bands = $('ep-bands');
+        bands.innerHTML = '';
+        var dayMax = {};
+        state.data.days.forEach(function (d) {
+          var m = -Infinity;
+          var lo = Infinity;
+          d.quarters.forEach(function (q) { m = Math.max(m, q.grid); lo = Math.min(lo, q.grid); });
+          d.quarters.forEach(function (q) { dayMax[q.from] = m > lo ? m : null; });
+        });
+        var i = 0;
+        while (i < win.length) {
+          if (win[i].grid !== dayMax[win[i].from]) { i++; continue; }
+          var j = i;
+          while (j < win.length && win[j].grid === dayMax[win[j].from]) j++;
+          var b = el('div', 'ep-band');
+          b.style.left = (i / n * 100) + '%';
+          b.style.width = ((j - i) / n * 100) + '%';
+          // Label only where there is room for it.
+          if ((j - i) / n * $('ep-chart').clientWidth > 52) b.appendChild(el('span', '', t('peak')));
+          bands.appendChild(b);
+          i = j;
+        }
+
+        var pend = $('ep-pending');
+        pend.classList.toggle('ep-hidden', !pending || win.length >= n);
+        if (pending && win.length < n) {
+          pend.textContent = t('pending');
+          pend.style.left = (win.length / n * 100) + '%';
+          pend.style.width = ((n - win.length) / n * 100) + '%';
+        }
+
+        var marker = $('ep-marker');
+        marker.classList.toggle('ep-hidden', cur < 0);
+        if (cur >= 0) marker.style.left = ((cur + 0.5) / n * 100) + '%';
+
+        var axis = $('ep-axis');
+        axis.innerHTML = '';
+        win.forEach(function (q, k) {
+          var hh = q.label.slice(0, 2);
+          var isHour = q.label.slice(3, 5) === '00' && (k === 0 || win[k - 1].hour !== q.hour);
+          if (isHour && Number(hh) % 3 === 0 && k > 1 && k < n - 4) {
+            var s = el('span', '', hh);
+            s.style.left = (k / n * 100) + '%';
+            axis.appendChild(s);
+          }
+        });
+      }
+
+      function renderDetail(box, q, res, prefix) {
+        box.innerHTML = '';
+        if (!q) return;
+        var head = el('div', 'ep-detail-head');
+        head.appendChild(el('span', '', prefix + q.label));
+        head.appendChild(el('strong', '', kr(q.price) + ' ' + t('unit')));
+        box.appendChild(head);
+        var fixed = res.surchargeKind === 'fixed';
+        var parts = [
+          { key: fixed ? 'energy' : 'spot', ore: fixed ? res.surchargeOre : q.spot, color: PART_COLOR[fixed ? 'surcharge' : 'spot'] },
+          { key: 'grid', ore: q.grid, color: PART_COLOR.grid },
+          { key: 'charges', ore: q.charges, color: PART_COLOR.charges },
+        ];
+        if (!fixed && res.surchargeOre) parts.push({ key: 'surcharge', ore: res.surchargeOre, color: PART_COLOR.surcharge });
+        var total = parts.reduce(function (a, x) { return a + Math.max(x.ore, 0); }, 0) || 1;
+        var stack = el('div', 'ep-stack');
+        var legend = el('div', 'ep-legend');
+        parts.forEach(function (x) {
+          var seg = el('div');
+          seg.style.width = (Math.max(x.ore, 0) / total * 100) + '%';
+          seg.style.background = x.color;
+          stack.appendChild(seg);
+          var item = el('span');
+          var dot = el('i');
+          dot.style.background = x.color;
+          item.appendChild(dot);
+          item.appendChild(document.createTextNode(t(x.key) + ' ' + kr(x.ore)));
+          legend.appendChild(item);
+        });
+        box.appendChild(stack);
+        box.appendChild(legend);
+      }
+
+      function renderFull(res, now) {
+        var base = 0;
+        res.days.forEach(function (d, k) { if (indexAt(d.quarters, now) >= 0) base = k; });
+        var hasTomorrow = res.days.length > base + 1;
+        if (!hasTomorrow) state.view = 0;
+        $('ep-tab-0').setAttribute('aria-pressed', String(state.view === 0));
+        $('ep-tab-1').setAttribute('aria-pressed', String(state.view === 1));
+        $('ep-tab-1').disabled = !hasTomorrow;
+
+        var day = res.days[base + state.view];
+        var gmax = -Infinity;
+        var gmin = Infinity;
+        day.quarters.forEach(function (q) { gmax = Math.max(gmax, q.grid); gmin = Math.min(gmin, q.grid); });
+
+        // Rows of up to four quarters per clock hour; the doubled hour 02 in October becomes two rows.
+        var rows = [];
+        day.quarters.forEach(function (q) {
+          var last = rows[rows.length - 1];
+          if (last && last[0].hour === q.hour && last.length < 4) last.push(q);
+          else rows.push([q]);
+        });
+
+        var box = $('ep-rows');
+        box.innerHTML = '';
+        var current = null;
+        rows.forEach(function (row) {
+          var r = el('div', 'ep-hrow');
+          if (gmax > gmin && row.every(function (q) { return q.grid === gmax; })) r.classList.add('ep-peak');
+          if (row[row.length - 1].to <= now) r.classList.add('ep-past');
+          r.appendChild(el('b', '', row[0].label.slice(0, 2)));
+          for (var k = 0; k < 4; k++) {
+            var q = row[k];
+            if (!q) { r.appendChild(el('span')); continue; }
+            var c = el('button', 'ep-cell');
+            c.type = 'button';
+            c.style.background = LEVEL_COLOR[q.level];
+            c.setAttribute('aria-label', q.label + ' ' + kr(q.price));
+            if (q.from <= now && now < q.to) { c.classList.add('ep-now'); current = q; }
+            if (state.fullPicked === q.from) c.classList.add('ep-picked');
+            (function (quarter) {
+              c.addEventListener('click', function () {
+                state.fullPicked = state.fullPicked === quarter.from ? null : quarter.from;
+                if (Homey.hapticFeedback) Homey.hapticFeedback();
+                render();
+              });
+            })(q);
+            r.appendChild(c);
+          }
+          var avg = row.reduce(function (a, q) { return a + q.price; }, 0) / row.length;
+          r.appendChild(el('span', 'ep-avg', kr(avg)));
+          box.appendChild(r);
+        });
+
+        var picked = null;
+        day.quarters.forEach(function (q) { if (q.from === state.fullPicked) picked = q; });
+        if (!picked) {
+          picked = current;
+          if (!picked) day.quarters.forEach(function (q) { if (!picked || q.price < picked.price) picked = q; });
+        }
+        renderDetail($('ep-full-detail'), picked, res, '');
+        renderStats(res);
+      }
+
+      function renderStats(res) {
+        var st = res.stats;
+        var grid = $('ep-grid');
+        grid.innerHTML = '';
+        if (!st) return;
+        var pct = function (x) { return x === null ? t('none') : (x > 0 ? '+' : '') + x + ' %'; };
+        var plain = function (x) { return x === null ? t('none') : String(x); };
+        [
+          [t('next'), kr(st.next)],
+          [t('hourAvg'), kr(st.hourAvg)],
+          [t('nextHour'), kr(st.nextHourAvg)],
+          [t('dayAvg'), kr(st.dayAvg)],
+          [t('dayMin'), kr(st.dayMin)],
+          [t('dayMax'), kr(st.dayMax)],
+          [t('vsAvg'), pct(st.vsAvgPct)],
+          [t('percentile'), plain(st.percentile)],
+          [t('percentileAhead'), plain(st.percentileAhead)],
+          [t('minutesCheap'), st.minutesToCheap === null ? t('none') : st.minutesToCheap === 0 ? t('nowCheap') : st.minutesToCheap + ' ' + t('minutes')],
+          [t('tomorrowAvg'), kr(st.tomorrowAvg)],
+          [t('cheapestHour'), st.cheapestHour.label],
+        ].forEach(function (r) {
+          var row = el('div', 'ep-row');
+          row.appendChild(el('span', '', r[0]));
+          row.appendChild(el('b', '', r[1]));
+          grid.appendChild(row);
+        });
+      }
+
+      function resize() {
+        var h = state.expanded ? Math.ceil(document.body.scrollHeight) : COMPACT;
+        if (Homey.setHeight) Homey.setHeight(h).catch(function () {});
+      }
+
+      $('ep-more').addEventListener('click', function () {
+        state.expanded = !state.expanded;
+        state.view = 0;
+        state.fullPicked = null;
+        render();
+        resize();
+      });
+      $('ep-tab-0').addEventListener('click', function () { state.view = 0; state.fullPicked = null; render(); resize(); });
+      $('ep-tab-1').addEventListener('click', function () { state.view = 1; state.fullPicked = null; render(); resize(); });
+      $('ep-source').addEventListener('click', function () { Homey.popup('https://elpriser.dk/data/#timepris'); });
+      $('ep-chart').addEventListener('click', function (ev) {
+        var rect = this.getBoundingClientRect();
+        var i = Math.max(0, Math.min(WINDOW - 1, Math.floor((ev.clientX - rect.left) / rect.width * WINDOW)));
+        state.picked = state.picked === i ? null : i;
+        if (Homey.hapticFeedback) Homey.hapticFeedback();
+        render();
+      });
+
+      Homey.on('prices-updated', function (msg) {
+        if (!state.data || !state.data.id || !msg || msg.id === state.data.id) load();
+      });
+      setInterval(render, 60 * 1000);
+      load();
+    }
+  </script>
+</body>
+</html>

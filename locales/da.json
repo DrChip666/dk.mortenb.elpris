@@ -1,0 +1,108 @@
+{
+  "lang": "da",
+  "device": {
+    "name": "Elpris"
+  },
+  "errors": {
+    "range": "Det første tal må ikke være større end det andet.",
+    "hours": "Skriv timer fra 0,25 til 24 i hele kvarterer, fx 3 eller 1,5.",
+    "deadline": "Vælg en frist på et kvarter: :00, :15, :30 eller :45."
+  },
+  "pair": {
+    "location": {
+      "title": "Hvor bor du?",
+      "subtitle": "Prisen indeholder nettariffen for dit område, så postnummeret betyder noget.",
+      "label": "Postnummer eller netområde",
+      "check": "Slå op",
+      "next": "Fortsæt",
+      "invalid": "Skriv et dansk postnummer som 2791, eller a og en netområdekode som a791.",
+      "unknown": "Elpriser.dk kender ikke stedet. Tjek postnummeret, og prøv igen.",
+      "network": "Elpriser.dk kunne ikke nås: __error__. Prøv igen om et par minutter.",
+      "found": "Netselskab:",
+      "area": "Netområde __area__ i __region__",
+      "ambiguous": "Postnummeret dækker flere netområder. Vælg det, der står på din elregning:",
+      "candidate": "Netområde __code__"
+    },
+    "agreement": {
+      "title": "Dit elselskabs tillæg",
+      "subtitle": "Lægges til hvert kvarter, så prisen passer med din regning. Abonnementet er ikke med, for det ændrer sig ikke hen over døgnet.",
+      "modeAgreement": "Vælg min aftale",
+      "modeManual": "Indtast tillægget selv",
+      "modeNone": "Uden tillæg, kun markedsprisen",
+      "search": "Søg efter elselskab eller aftale",
+      "count": "__shown__ af __total__ aftaler",
+      "unavailable": "Listen over aftaler kunne ikke hentes. Indtast tillægget selv i stedet.",
+      "manualLabel": "Tillæg i øre/kWh inkl. moms",
+      "manualHint": "Det står på din elregning eller på elselskabets hjemmeside.",
+      "add": "Tilføj enhed",
+      "oreUnit": "øre/kWh",
+      "fixed": "fastpris",
+      "pickOne": "Vælg en aftale på listen, eller vælg en anden mulighed ovenfor.",
+      "badNumber": "Skriv tillægget som et tal, fx 4,95."
+    }
+  },
+  "surcharge": {
+    "none": "Uden tillæg",
+    "manual": "Dit eget: __ore__ øre/kWh",
+    "agreement": "__supplier__, __product__: +__ore__ øre/kWh",
+    "fixed": "__supplier__, __product__: fast __ore__ øre/kWh i stedet for spotprisen",
+    "missing": "Aftalen blev ikke fundet. Bruger dit eget tillæg: __ore__ øre/kWh",
+    "missingWarning": "Din aftale står ikke længere på Elpriser.dk. Det tillæg, du har indtastet, bruges i stedet."
+  },
+  "settings": {
+    "placeInfo": "__company__, netområde __area__, __region__",
+    "placeUnknown": "Kendes ikke endnu",
+    "stedFormat": "Skriv stedet som __sted__."
+  },
+  "warnings": {
+    "noPrice": "Ingen pris for det aktuelle kvarter endnu.",
+    "tooFewAhead": "Der kendes priser for færre end fire timer frem."
+  },
+  "widget": {
+    "location": "Elpris",
+    "today": "I dag",
+    "tomorrow": "I morgen",
+    "now": "Nu",
+    "levelcheap": "billig",
+    "levelmid": "middel",
+    "levelexpensive": "dyr",
+    "peak": "Spidslast",
+    "spot": "Spot",
+    "grid": "Net",
+    "charges": "Afgifter",
+    "surcharge": "Tillæg",
+    "energy": "Energi",
+    "source": "Kilde: Elpriser.dk",
+    "noDevice": "Tilføj først en Elpris-enhed.",
+    "noData": "Ingen priser endnu. De hentes hvert kvarter.",
+    "tomorrowPending": "Morgendagens priser kommer typisk mellem kl. 13 og 15.",
+    "unit": "kr./kWh",
+    "next": "Næste kvarter",
+    "hourAvg": "Denne time",
+    "nextHour": "Næste time",
+    "dayAvg": "Gennemsnit",
+    "dayMin": "Laveste",
+    "dayMax": "Højeste",
+    "vsAvg": "ift. gennemsnit",
+    "percentile": "Plads i døgnet",
+    "percentileAhead": "Plads næste døgn",
+    "minutesCheap": "Til billig",
+    "tomorrowAvg": "I morgen gns.",
+    "cheapestHour": "Billigste time",
+    "dearestHour": "Dyreste time",
+    "minutes": "min",
+    "nowCheap": "nu",
+    "none": "–",
+    "showAll": "Vis hele døgnet",
+    "showLess": "Vis mindre",
+    "cheapestAhead": "Billigste time frem",
+    "pending": "Morgendagens priser kommer kl. 13–15",
+    "hourAvgShort": "gns."
+  },
+  "hoursText": "__hours__: __price__ kr./kWh",
+  "level": {
+    "cheap": "billig",
+    "mid": "middel",
+    "expensive": "dyr"
+  }
+}

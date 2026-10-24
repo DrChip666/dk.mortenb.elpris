@@ -1,0 +1,12 @@
+{
+  "type": "number",
+  "title": { "en": "Place in the day", "da": "Plads i døgnet" },
+  "min": 0,
+  "max": 100,
+  "decimals": 0,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_percentile.svg"
+}

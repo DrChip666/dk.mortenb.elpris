@@ -1,0 +1,50 @@
+{
+  "name": {
+    "en": "Electricity price",
+    "da": "Elpris"
+  },
+  "class": "sensor",
+  "capabilities": [
+    "measure_elpris_now",
+    "elpris_level",
+    "measure_elpris_next",
+    "measure_elpris_hour",
+    "measure_elpris_next_hour",
+    "measure_elpris_day_avg",
+    "measure_elpris_day_min",
+    "measure_elpris_day_max",
+    "measure_elpris_vs_avg",
+    "measure_elpris_percentile",
+    "measure_elpris_percentile_ahead",
+    "measure_elpris_minutes_cheap",
+    "elpris_tomorrow",
+    "measure_elpris_tomorrow_avg",
+    "elpris_cheapest_hour",
+    "elpris_dearest_hour"
+  ],
+  "platforms": [
+    "local"
+  ],
+  "connectivity": [
+    "cloud"
+  ],
+  "images": {
+    "small": "{{driverAssetsPath}}/images/small.png",
+    "large": "{{driverAssetsPath}}/images/large.png",
+    "xlarge": "{{driverAssetsPath}}/images/xlarge.png"
+  },
+  "pair": [
+    {
+      "id": "location",
+      "navigation": {
+        "next": "agreement"
+      }
+    },
+    {
+      "id": "agreement",
+      "navigation": {
+        "prev": "location"
+      }
+    }
+  ]
+}

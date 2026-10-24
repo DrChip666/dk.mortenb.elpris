@@ -1,0 +1,13 @@
+{
+  "type": "enum",
+  "title": { "en": "Price level", "da": "Prisniveau" },
+  "values": [
+    { "id": "cheap", "title": { "en": "Cheap", "da": "Billig" } },
+    { "id": "mid", "title": { "en": "Medium", "da": "Middel" } },
+    { "id": "expensive", "title": { "en": "Expensive", "da": "Dyr" } }
+  ],
+  "getable": true,
+  "setable": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_level.svg"
+}

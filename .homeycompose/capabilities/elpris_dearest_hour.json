@@ -1,0 +1,12 @@
+{
+  "type": "string",
+  "title": {
+    "en": "Most expensive hour",
+    "da": "Dyreste time"
+  },
+  "getable": true,
+  "setable": false,
+  "insights": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_level.svg"
+}

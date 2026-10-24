@@ -1,0 +1,9 @@
+{
+  "type": "boolean",
+  "title": { "en": "Tomorrow's prices", "da": "Morgendagens priser" },
+  "getable": true,
+  "setable": false,
+  "insights": false,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_tomorrow.svg"
+}

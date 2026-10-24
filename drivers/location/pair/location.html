@@ -1,0 +1,111 @@
+<style>
+  .ep-row { display: flex; gap: 8px; }
+  .ep-row .homey-form-input { flex: 1; }
+  .ep-result { margin-top: 16px; line-height: 1.45; }
+  .ep-result strong { font-weight: 600; }
+  .ep-choices label { display: flex; gap: 8px; align-items: center; padding: 6px 0; }
+  .ep-error { color: var(--homey-color-danger, #c8453b); margin-top: 12px; }
+  .ep-hidden { display: none; }
+</style>
+
+<header class="homey-header">
+  <h1 class="homey-title" data-i18n="pair.location.title"></h1>
+  <p class="homey-subtitle" data-i18n="pair.location.subtitle"></p>
+</header>
+
+<form class="homey-form" id="ep-form" onsubmit="return false;">
+  <div class="homey-form-group">
+    <label class="homey-form-label" for="ep-sted" data-i18n="pair.location.label"></label>
+    <div class="ep-row">
+      <input class="homey-form-input" id="ep-sted" type="text" inputmode="text" autocomplete="postal-code" maxlength="6" />
+      <button class="homey-button-secondary" id="ep-check" type="submit" data-i18n="pair.location.check"></button>
+    </div>
+  </div>
+
+  <div class="ep-result ep-hidden" id="ep-result"></div>
+  <div class="ep-choices ep-hidden" id="ep-choices"></div>
+  <p class="ep-error ep-hidden" id="ep-error"></p>
+
+  <button class="homey-button-primary-full ep-hidden" id="ep-next" type="button" data-i18n="pair.location.next"></button>
+</form>
+
+<script type="text/javascript">
+  (function () {
+    var input = document.getElementById('ep-sted');
+    var result = document.getElementById('ep-result');
+    var choices = document.getElementById('ep-choices');
+    var errorEl = document.getElementById('ep-error');
+    var nextBtn = document.getElementById('ep-next');
+    var form = document.getElementById('ep-form');
+
+    function show(el, on) { el.classList.toggle('ep-hidden', !on); }
+    function text(el, value) { el.textContent = value; }
+
+    function check(sted) {
+      show(errorEl, false);
+      Homey.showLoadingOverlay();
+      return Homey.emit('check_place', sted)
+        .then(function (res) {
+          Homey.hideLoadingOverlay();
+          var p = res.place;
+          result.innerHTML = '';
+          var line = document.createElement('div');
+          var strong = document.createElement('strong');
+          strong.textContent = p.gridCompany || '–';
+          line.appendChild(document.createTextNode(Homey.__('pair.location.found') + ' '));
+          line.appendChild(strong);
+          var sub = document.createElement('div');
+          sub.textContent = Homey.__('pair.location.area', { area: p.gridArea || '–', region: p.regionLabel || p.region || '–' });
+          result.appendChild(line);
+          result.appendChild(sub);
+          show(result, true);
+
+          choices.innerHTML = '';
+          if (p.ambiguous && p.candidates.length > 1) {
+            var intro = document.createElement('p');
+            intro.textContent = Homey.__('pair.location.ambiguous');
+            choices.appendChild(intro);
+            p.candidates.forEach(function (code, i) {
+              var label = document.createElement('label');
+              var radio = document.createElement('input');
+              radio.type = 'radio';
+              radio.name = 'ep-candidate';
+              radio.value = 'a' + code;
+              radio.checked = i === 0;
+              label.appendChild(radio);
+              label.appendChild(document.createTextNode(Homey.__('pair.location.candidate', { code: code })));
+              choices.appendChild(label);
+            });
+            show(choices, true);
+          } else {
+            show(choices, false);
+          }
+          show(nextBtn, true);
+          return res;
+        })
+        .catch(function (err) {
+          Homey.hideLoadingOverlay();
+          show(result, false);
+          show(choices, false);
+          show(nextBtn, false);
+          text(errorEl, err.message || String(err));
+          show(errorEl, true);
+        });
+    }
+
+    form.addEventListener('submit', function () { check(input.value); });
+
+    nextBtn.addEventListener('click', function () {
+      var picked = document.querySelector('input[name="ep-candidate"]:checked');
+      var first = choices.querySelector('input[name="ep-candidate"]');
+      // A different grid area than the first one: look it up so the next view gets the right prices.
+      if (picked && first && picked.value !== first.value) {
+        check(picked.value).then(function (res) { if (res) Homey.nextView(); });
+      } else {
+        Homey.nextView();
+      }
+    });
+
+    input.focus();
+  })();
+</script>

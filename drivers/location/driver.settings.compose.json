@@ -1,0 +1,215 @@
+[
+  {
+    "type": "group",
+    "label": {
+      "en": "Location",
+      "da": "Sted"
+    },
+    "children": [
+      {
+        "id": "sted",
+        "type": "text",
+        "label": {
+          "en": "Postcode or grid area",
+          "da": "Postnummer eller netområde"
+        },
+        "value": "",
+        "hint": {
+          "en": "A Danish postcode such as 2791, or a and the grid area code such as a791 when your postcode covers several grid areas.",
+          "da": "Et postnummer som 2791, eller a og netområdets kode som a791, når dit postnummer dækker flere netområder."
+        }
+      },
+      {
+        "id": "place_info",
+        "type": "label",
+        "label": {
+          "en": "Grid company",
+          "da": "Netselskab"
+        },
+        "value": ""
+      }
+    ]
+  },
+  {
+    "type": "group",
+    "label": {
+      "en": "Supplier surcharge",
+      "da": "Elselskabets tillæg"
+    },
+    "children": [
+      {
+        "id": "surcharge_mode",
+        "type": "dropdown",
+        "label": {
+          "en": "Surcharge from",
+          "da": "Tillæg fra"
+        },
+        "value": "agreement",
+        "values": [
+          {
+            "id": "agreement",
+            "label": {
+              "en": "My agreement on Elpriser.dk",
+              "da": "Min aftale på Elpriser.dk"
+            }
+          },
+          {
+            "id": "manual",
+            "label": {
+              "en": "Entered by me",
+              "da": "Indtastet af mig"
+            }
+          },
+          {
+            "id": "none",
+            "label": {
+              "en": "No surcharge",
+              "da": "Uden tillæg"
+            }
+          }
+        ]
+      },
+      {
+        "id": "agreement_slug",
+        "type": "text",
+        "label": {
+          "en": "Agreement ID",
+          "da": "Aftalens ID"
+        },
+        "value": "",
+        "hint": {
+          "en": "Set during pairing. To choose another agreement, add the device again, or enter the productSlug from elpriser.json.",
+          "da": "Sættes, når enheden tilføjes. Vil du vælge en anden aftale, så tilføj enheden igen, eller skriv productSlug fra elpriser.json."
+        }
+      },
+      {
+        "id": "manual_surcharge",
+        "type": "number",
+        "label": {
+          "en": "My surcharge",
+          "da": "Mit tillæg"
+        },
+        "value": 0,
+        "min": -100,
+        "max": 500,
+        "step": 0.01,
+        "units": {
+          "en": "øre/kWh",
+          "da": "øre/kWh"
+        },
+        "hint": {
+          "en": "Including VAT. Used when the surcharge is entered by you, and as a fallback when the agreement cannot be found.",
+          "da": "Inkl. moms. Bruges, når tillægget er indtastet af dig, og som reserve, hvis aftalen ikke kan findes."
+        }
+      },
+      {
+        "id": "agreement_info",
+        "type": "label",
+        "label": {
+          "en": "Surcharge in use",
+          "da": "Tillæg i brug"
+        },
+        "value": ""
+      }
+    ]
+  },
+  {
+    "type": "group",
+    "label": {
+      "en": "Values shown",
+      "da": "Viste værdier"
+    },
+    "children": [
+      {
+        "id": "show_next",
+        "type": "checkbox",
+        "label": {
+          "en": "Next quarter",
+          "da": "Næste kvarter"
+        },
+        "value": true
+      },
+      {
+        "id": "show_hour",
+        "type": "checkbox",
+        "label": {
+          "en": "Hour average",
+          "da": "Timegennemsnit"
+        },
+        "value": true
+      },
+      {
+        "id": "show_next_hour",
+        "type": "checkbox",
+        "label": {
+          "en": "Next hour",
+          "da": "Næste time"
+        },
+        "value": true
+      },
+      {
+        "id": "show_day",
+        "type": "checkbox",
+        "label": {
+          "en": "Day average, lowest and highest",
+          "da": "Dagens gennemsnit, laveste og højeste"
+        },
+        "value": true
+      },
+      {
+        "id": "show_vs_avg",
+        "type": "checkbox",
+        "label": {
+          "en": "Compared with average",
+          "da": "I forhold til gennemsnit"
+        },
+        "value": true
+      },
+      {
+        "id": "show_percentile",
+        "type": "checkbox",
+        "label": {
+          "en": "Place in the day",
+          "da": "Plads i døgnet"
+        },
+        "value": true
+      },
+      {
+        "id": "show_percentile_ahead",
+        "type": "checkbox",
+        "label": {
+          "en": "Place next 24 hours",
+          "da": "Plads næste døgn"
+        },
+        "value": true
+      },
+      {
+        "id": "show_minutes_cheap",
+        "type": "checkbox",
+        "label": {
+          "en": "Minutes until cheap",
+          "da": "Minutter til billig"
+        },
+        "value": true
+      },
+      {
+        "id": "show_tomorrow",
+        "type": "checkbox",
+        "label": {
+          "en": "Tomorrow's prices and average",
+          "da": "Morgendagens priser og gennemsnit"
+        },
+        "value": true
+      },
+      {
+        "id": "show_hours_text",
+        "type": "checkbox",
+        "label": {
+          "en": "Cheapest and most expensive hour",
+          "da": "Billigste og dyreste time"
+        },
+        "value": true
+      }
+    ]
+  }
+]

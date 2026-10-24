@@ -1,0 +1,42 @@
+{
+  "id": "dk.mortenb.elpris",
+  "version": "1.2.0",
+  "compatibility": ">=12.3.0",
+  "sdk": 3,
+  "runtime": "nodejs",
+  "platforms": ["local"],
+  "name": {
+    "en": "Electricity Price",
+    "da": "Elpris"
+  },
+  "description": {
+    "en": "See what every quarter of an hour costs, with your own supplier's surcharge",
+    "da": "Se hvad hvert kvarter koster, med dit eget elselskabs tillæg"
+  },
+  "category": ["energy"],
+  "tags": {
+    "en": ["electricity price", "spot price", "quarter", "Denmark", "grid tariff"],
+    "da": ["elpris", "spotpris", "kvarter", "Danmark", "nettarif"]
+  },
+  "brandColor": "#1F5F8B",
+  "permissions": [],
+  "images": {
+    "small": "/assets/images/small.png",
+    "large": "/assets/images/large.png",
+    "xlarge": "/assets/images/xlarge.png"
+  },
+  "author": {
+    "name": "Morten B."
+  },
+  "contributors": {
+    "developers": [
+      { "name": "Morten B." },
+      { "name": "Claude (Anthropic), AI coding assistant" }
+    ]
+  },
+  "contributing": {
+    "donate": {
+      "paypal": { "username": "MortenBech241" }
+    }
+  }
+}

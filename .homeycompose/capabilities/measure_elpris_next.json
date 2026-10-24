@@ -1,0 +1,17 @@
+{
+  "type": "number",
+  "title": {
+    "en": "Next quarter",
+    "da": "Næste kvarter"
+  },
+  "decimals": 2,
+  "getable": true,
+  "setable": false,
+  "insights": true,
+  "uiComponent": "sensor",
+  "icon": "/assets/capability_price.svg",
+  "units": {
+    "en": "kr/kWh",
+    "da": "kr./kWh"
+  }
+}
